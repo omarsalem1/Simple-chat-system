@@ -35,8 +35,9 @@ namespace lab_11_server
             port = 1090;
             server = new TcpListener(localadd, port);
             button2.Enabled = false;
-            button3.Enabled = false;
+            //button3.Enabled = false;
             button4.Enabled = false;
+            
 
 
         }
@@ -46,7 +47,7 @@ namespace lab_11_server
             bR.Close();
             bW.Close();
             nstream.Close();
-           // connection.Shutdown();
+           connection.Shutdown(SocketShutdown.Both);
             connection.Close();
             this.Close();
 
@@ -63,16 +64,18 @@ namespace lab_11_server
             bW = new BinaryWriter(nstream);
             bR = new BinaryReader(nstream);
             button2.Enabled = true;
-            button3.Enabled = true;
+            //button3.Enabled = true;
             button4.Enabled = true;
+           
+            backgroundWorker1.RunWorkerAsync();
 
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            string input;
-            input = bR.ReadString();
-            listBox1.Items.Add("client : " + input);
+            //string input;
+            //input = bR.ReadString();
+            //listBox1.Items.Add("client : " + input);
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -80,6 +83,25 @@ namespace lab_11_server
             listBox1.Items.Add("Server  :" + textBox1.Text);
             bW.Write(textBox1.Text);
             textBox1.Clear();
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (connection.Connected )
+            {
+                if (bR != null)
+                {
+                    string input;
+                    input = bR.ReadString();
+                    AddToListBox("Client : " + input);
+                }
+            }
+        }
+        private void AddToListBox(object oo)
+        {
+            Invoke(new MethodInvoker(
+                           delegate { listBox1.Items.Add(oo); }
+                           ));
         }
     }
 }
